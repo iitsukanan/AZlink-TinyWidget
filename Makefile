@@ -6,6 +6,7 @@ DIRS=	json work
 
 all: $(DIRS) tinywidget.min.js
 	@chmod 777 $(DIRS)
+	@chmod 666 tinywidget.min.js
 
 $(DIRS):
 	mkdir -p $@
