@@ -1,0 +1,63 @@
+Amazon のベストセラーや新着ニューリリースと連動したブログパーツを作成できるサーバ設置型のスクリプトです。
+
+AZlink/Widget ウェブサービス廃止に伴い代替品として開発中です。
+
+主な特徴
+********
+
+1. Amazon のベストセラーや新着ニューリリースと連動して商品を表示します。ブログパーツに表示される商品は Amazon の販売動向に従って自動で更新されていきますので完全放置でも売れ筋商品を常に表示できます。
+2. JavaScript ブログパーツではブログパーツの処理が完了するまで次のコンテンツの表示が待たされることがありますが、AZlink/widget では JavaScript による処理待ちは発生しません。
+3. できるだけ静的ファイルのみで処理するように実装していますので、アクセスが多めのサイトでもそれなりに動くと思います。
+
+インストール
+************
+
+1. github からファイルをダウンロードしてください。
+
+2. パーミッションを確認してください。以下のファイルとディレクトリはウェブサーバのユーザーから読み書きできる必要があります。ZIP ファイル上のパーミッションは、ファイルは 666、ディレクトリは 777 になってますが展開方法によってはパーミッションが落ちることがあります。
+
+	tinywidget.min.js json/ work/
+
+3. api.php の設定を行ってください。適切に実行するには COMPILE_JS を true にする必要があります。
+
+	define('COMPILE_JS', true);
+
+4. index.html にアクセスしてブログパーツの動作確認を行ってください。
+
+5. 動作確認できたら実際のページにブログパーツを貼ります。
+
+まず head に script タグを追加します。
+
+	<head>
+	<script type="text/javascript" src="/azlink/tinywidget.min.js"></script>
+	</head>
+
+body のブログパーツ設置箇所に script タグを置きます。
+
+	<script type="text/javascript">
+	//<!--
+	AZlink.TinyWidget.sidebar({
+	    associateId: "ASSOCIATE_ID",
+	    node: "bestsellers/videogames",
+	    numItems: 5
+	});
+	//-->
+	</script>
+
+	<script type="text/javascript">
+	//<!--
+	AZlink.TinyWidget.banner({
+	    associateId: "ASSOCIATE_ID",
+	    node: "new-releases/toys",
+	    numItems: 5
+	});
+	//-->
+	</script>
+
+AZlink/Widget から移行する際の注意点
+************************************
+
+1. JavaScript のファイル名が tinywidget.min.js に変わっています。
+2. エントリポイントオブジェクトが AZlink.TinyWidget に変わっています。
+3. 商品データのオブジェクト構造が変更されています。（ドキュメント未整備です。）
+4. データの取得を JSON で行っていますので、ドメイン越しでのスクリプトの実行はできません。
