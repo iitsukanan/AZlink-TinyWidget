@@ -1,3 +1,5 @@
+PYTHON=	python
+
 VERS=	1.0.0
 DIST=	azlink-tinywidget-$(VERS).zip
 DIRS=	json work
@@ -6,14 +8,16 @@ DIRS=	json work
 
 all: $(DIRS) tinywidget.min.js
 	@chmod 777 $(DIRS)
-	@chmod 666 tinywidget.min.js
 
 $(DIRS):
 	mkdir -p $@
 
-tinywidget.min.js: api.php tinywidget.js
-	php api.php -b'false'
+tinywidget.min.js: tinywidget.min.js.in
+	cp tinywidget.min.js.in tinywidget.min.js
 	chmod 666 $@
+
+tinywidget.min.js.in: api.php tinywidget.js
+	$(PYTHON) compile.py tinywidget.js $@
 
 dist: all
 	zip -X $(DIST) api.php index.html tinywidget.js tinywidget.min.js $(DIRS)

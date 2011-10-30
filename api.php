@@ -210,32 +210,11 @@ function mkdir_p($dir, $mode=0777) {
 
 // 
 
-function google_closure($js) {
-    $ch = curl_init('http://closure-compiler.appspot.com/compile');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_BINARYTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-	'js_code' => $js,
-	'compilation_level' => 'SIMPLE_OPTIMIZATIONS',
-	'output_info' => 'compiled_code',
-	'output_format' => 'text',
-    )));
-    $ctx = curl_exec($ch);
-    if (!$ctx) {
-	trigger_error('Google closure API call failed', E_USER_ERROR);
-    }
-    curl_close($ch);
-    return $ctx;
-}
+function minify_script() {
+    $src = 'tinywidget.min.js.in';
+    $dest = 'tinywidget.min.js';
 
-function minify_script($src, $dest) {
     if (file_exists($dest)) {
-	// 存在して書き込めない時は何もしない
-	if (!is_writable($dest)) {
-	    return;
-	}
-
 	// タイムスタンプを比較
 	$mtime = filemtime($dest);
 	if (filemtime($src) <= $mtime && filemtime(__file__) <= $mtime) {
@@ -263,48 +242,51 @@ function minify_script($src, $dest) {
 	}
     }
 
-    // 設定値で上書き
-    $lines = @file($src);
+    // 現在の設定値を読み込む
+    $lines = @file($dest);
     if ($lines === FALSE) {
 	@unlink($lock_path);
 	fclose($lock);
 	return;
     }
-
-    $changed = false;
-    $nlines = count($lines);
-    for ($i = 0; $i < $nlines; ++$i) {
-	if (preg_match('/^\s*(baseuri|jsonUpdateProbability)\s*:\s*(.*?)(,?)$/', $lines[$i], $mo)) {
-	    $var = false;
-	    switch ($mo[1]) {
-	    case 'baseuri':
-		$baseuri = $GLOBALS['API_BASEURI'];
-		if (is_null($baseuri)) {
-		    if (isset($_SERVER['PHP_SELF'])) {
-			$re = '/' . preg_quote(basename(__file__), '/') . '$/';
-			$baseuri = preg_replace($re, '', $_SERVER['PHP_SELF']);
-		    } else {
-			$baseuri = '';
-		    }
-		}
-		$var = json_encode($baseuri);
-		break;
-	    case 'jsonUpdateProbability':
-		$var = json_encode($GLOBALS['JSON_UPDATE_PROBARILITY']);
-		break;
-	    }
-	    if (json_decode($mo[2]) !== json_decode($var)) {
-		$changed = true;
-	    }
-	    $lines[$i] = "{$mo[1]}:{$var}{$mo[3]}\n";
+    $opts = array();
+    foreach ($lines as $line) {
+	if (preg_match('/^AZlink\.TinyWidget\.(\w+)=(.*);$/', $line, $mo)) {
+	    $opts[$mo[1]] = json_decode($mo[2]);
 	}
     }
 
+    // PHP の設定と比較
+    $changed = false;
+
+    if (is_null($GLOBALS['API_BASEURI'])) {
+	if (isset($_SERVER['PHP_SELF'])) {
+	    $re = '/' . preg_quote(basename(__file__), '/') . '$/';
+	    $baseuri = preg_replace($re, '', $_SERVER['PHP_SELF']);
+	} else {
+	    $baseuri = '';
+	}
+    } else {
+	$baseuri = $GLOBALS['API_BASEURI'];
+    }
+
+    if (!isset($opts['baseuri']) || $opts['baseuri'] != $baseuri) {
+	$changed = true;
+    }
+
+    if (!isset($opts['jsonUpdateProbability']) ||
+	$opts['jsonUpdateProbability'] != $GLOBALS['JSON_UPDATE_PROBARILITY']) {
+	$changed = true;
+    }
+
     if ($changed) {
-	$ctx = "// AZlink/TinyWidget\n" .
-	       "// This file licensed under the MIT license.\n" .
-	       google_closure(implode('', $lines));
-	file_put_contents($dest, $ctx);
+	$ctx = file($src);
+	for ($i = 0; $i < count($ctx); ++$i) {
+	    $ctx[$i] = rtrim($ctx[$i]);
+	}
+	$ctx[] = "AZlink.TinyWidget.baseuri=" . json_encode($baseuri) . ";";
+	$ctx[] = "AZlink.TinyWidget.jsonUpdateProbability=" . json_encode($GLOBALS['JSON_UPDATE_PROBARILITY']) . ";";
+	file_put_contents($dest, implode("\n", $ctx));
     } else {
 	touch($dest);
     }
@@ -439,7 +421,7 @@ function json_response($node) {
  */
 
 if ($GLOBALS['COMPILE_JS']) {
-    minify_script('tinywidget.js', 'tinywidget.min.js');
+    minify_script();
 }
 
 // node パラメータがあれば JSON 出力
