@@ -1,0 +1,36 @@
+<?php
+
+/*
+ * AZlink/TinyWidget 設定ファイル
+ * コメントアウトしている値はデフォルト値です。
+ */
+
+// JSON をキャッシュするディレクトリ
+#$JSON_CACHE_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'json';
+
+// 作業用ディレクトリ
+#$WORK_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'work';
+
+// JSON キャッシュの生存期間（秒）
+#$JSON_CACHE_LIFETIME = 3600;
+
+// true なら JavaScript の自動コンパイルを行う
+#$COMPILE_JS = true;
+
+// JSON キャッシュの更新発生確率
+// JSON キャッシュの生存期間を過ぎたファイルに対して JavaScript から
+// 更新指示を出す確率で、0.0〜1.0で指定してください。
+// min(1 / 閑散期の1分あたりの PV (ページビュー), 1.0) ぐらいの値が適切です。
+#$JSON_UPDATE_PROBARILITY = 1.0;
+
+// JavaScript から API を呼び出す際の baseURI
+// NULL の場合 $_SERVER[PHP_SELF] から適当な値を使用しますので通常は未指定
+// 問題無いと思います。
+// セットする場合、http://example.com/widget/api.php にこのスクリプトを
+// 置く場合は /widget/ になります。
+#$API_BASEURI = NULL;
+
+// true なら RSS テンポラリファイルを残す（どちらかと言えばデバッグ用）
+#$KEEP_RSS_TEMPORARY_FILES = false;
+
+// vim:ft=php:ts=8:sw=4:

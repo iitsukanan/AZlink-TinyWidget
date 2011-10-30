@@ -26,33 +26,50 @@
  * 設定
  */
 
-// JSON をキャッシュするディレクトリ
-define('JSON_CACHE_DIR', dirname(__file__) . DIRECTORY_SEPARATOR . 'json');
+global $JSON_CACHE_DIR, $WORK_DIR, $JSON_CACHE_LIFETIME, $COMPILE_JS,
+       $JSON_UPDATE_PROBARILITY, $API_BASEURI, $KEEP_RSS_TEMPORARY_FILES;
 
-// 作業用ディレクトリ
-define('WORK_DIR', dirname(__file__) . DIRECTORY_SEPARATOR . 'work');
+// デフォルト値のセット
+// 詳細は config.php.example 参照
+$JSON_CACHE_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'json';
+$WORK_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'work';
+$JSON_CACHE_LIFETIME = 3600;
+$COMPILE_JS = true;
+$JSON_UPDATE_PROBARILITY = 1.0;
+$API_BASEURI = NULL;
+$KEEP_RSS_TEMPORARY_FILES = false;
 
-// JSON キャッシュの生存期間（秒）
-define('JSON_CACHE_LIFETIME', 3600);
+// config.php を読み込む
+@include 'config.php';
 
-// true なら JavaScript の自動コンパイルを行う
-define('COMPILE_JS', false);
-
-// JSON キャッシュの更新発生確率
-// JSON キャッシュの生存期間を過ぎたファイルに対して JavaScript から
-// 更新指示を出す確率で、0.0〜1.0で指定してください。
-// min(1 / 閑散期の1分あたりの PV (ページビュー), 1.0) ぐらいの値が適切です。
-define('JS_JSON_UPDATE_PROBARILITY', 1.0);
-
-// JavaScript から API を呼び出す際の baseURI
-// NULL の場合 $_SERVER[PHP_SELF] から適当な値を使用しますので通常は NULL で
-// 問題無いと思います。
-// セットする場合、http://example.com/widget/api.php にこのスクリプトを
-// 置く場合は /widget/ になります。
-define('JS_BASEURI', NULL);
-
-// true なら RSS テンポラリファイルを残す（どちらかと言えばデバッグ用）
-define('KEEP_RSS_TEMPORARY_FILES', false);
+// cli 起動時はコマンドラインオプションも読み込む
+if (php_sapi_name() == 'cli') {
+    foreach (getopt('c:w:l:j:p:b:k:') as $opt => $arg) {
+	switch ($opt) {
+	case 'c':
+	    $JSON_CACHE_DIR = $arg;
+	    break;
+	case 'w':
+	    $WORK_DIR = $arg;
+	    break;
+	case 'l':
+	    $JSON_CACHE_LIFETIME = (float)$arg;
+	    break;
+	case 'j':
+	    $COMPILE_JS = ($arg == 'false' ? false : true);
+	    break;
+	case 'p':
+	    $JSON_UPDATE_PROBARILITY = (float)$arg;
+	    break;
+	case 'b':
+	    $API_BASEURI = ($arg == 'false' ? '' : ($arg == 'null' ? NULL : $arg));
+	    break;
+	case 'k':
+	    $KEEP_RSS_TEMPORARY_FILES = ($arg == 'false' ? false : true);
+	    break;
+	}
+    }
+}
 
 // 
 
@@ -173,7 +190,7 @@ function parse_rss_string($ctx) {
 
     return array(
 	'items' => $items,
-	'expire' => gmdate('r', time() + JSON_CACHE_LIFETIME),
+	'expire' => gmdate('r', time() + $GLOBALS['JSON_CACHE_LIFETIME']),
     );
 }
 
@@ -227,7 +244,7 @@ function minify_script($src, $dest) {
     }
 
     // ロックする
-    $lock_path = WORK_DIR . DIRECTORY_SEPARATOR . 'minify.lock';
+    $lock_path = $GLOBALS['WORK_DIR'] . DIRECTORY_SEPARATOR . 'minify.lock';
     $lock = fopen($lock_path, 'w+');
     if (!flock($lock, LOCK_EX)) {
 	exit(1);
@@ -254,13 +271,14 @@ function minify_script($src, $dest) {
 	return;
     }
 
+    $changed = false;
     $nlines = count($lines);
     for ($i = 0; $i < $nlines; ++$i) {
-	if (preg_match('/^\s*(baseuri|jsonUpdateProbability)\s*:\s*.*?(,?)$/',
-	    $lines[$i], $mo)) {
+	if (preg_match('/^\s*(baseuri|jsonUpdateProbability)\s*:\s*(.*?)(,?)$/', $lines[$i], $mo)) {
+	    $var = false;
 	    switch ($mo[1]) {
 	    case 'baseuri':
-		$baseuri = JS_BASEURI;
+		$baseuri = $GLOBALS['API_BASEURI'];
 		if (is_null($baseuri)) {
 		    if (isset($_SERVER['PHP_SELF'])) {
 			$re = '/' . preg_quote(basename(__file__), '/') . '$/';
@@ -272,17 +290,24 @@ function minify_script($src, $dest) {
 		$var = json_encode($baseuri);
 		break;
 	    case 'jsonUpdateProbability':
-		$var = json_encode(JS_JSON_UPDATE_PROBARILITY);
+		$var = json_encode($GLOBALS['JSON_UPDATE_PROBARILITY']);
 		break;
 	    }
-	    $lines[$i] = "{$mo[1]}:{$var}{$mo[2]}\n";
+	    if (json_decode($mo[2]) !== json_decode($var)) {
+		$changed = true;
+	    }
+	    $lines[$i] = "{$mo[1]}:{$var}{$mo[3]}\n";
 	}
     }
 
-    $ctx = "// AZlink/TinyWidget\n" .
-	   "// This file licensed under the MIT license.\n" .
-	   google_closure(implode('', $lines));
-    file_put_contents($dest, $ctx);
+    if ($changed) {
+	$ctx = "// AZlink/TinyWidget\n" .
+	       "// This file licensed under the MIT license.\n" .
+	       google_closure(implode('', $lines));
+	file_put_contents($dest, $ctx);
+    } else {
+	touch($dest);
+    }
 
     @unlink($lock_path);
     fclose($lock);
@@ -326,7 +351,7 @@ function put_json_if_available($json_path) {
 function json_response($node) {
     // パラメータチェックとか
     $node = trim($node, '/');
-    $json_path = JSON_CACHE_DIR . DIRECTORY_SEPARATOR . $node . '.js';
+    $json_path = $GLOBALS['JSON_CACHE_DIR'] . DIRECTORY_SEPARATOR . $node . '.js';
     if (basename($json_path) == '.js') {
 	forbidden();
 	trigger_error("Invalid node {$node}", E_USER_ERROR);
@@ -338,11 +363,11 @@ function json_response($node) {
     }
 
     // rss を読み込む準備
-    if (!mkdir_p(WORK_DIR)) {
+    if (!mkdir_p($GLOBALS['WORK_DIR'])) {
 	forbidden();
 	exit(1);
     }
-    $rss_path = WORK_DIR . DIRECTORY_SEPARATOR . rawurlencode($node);
+    $rss_path = $GLOBALS['WORK_DIR'] . DIRECTORY_SEPARATOR . rawurlencode($node);
     $fh = fopen($rss_path, "wb");
     if (!$fh) {
 	forbidden();
@@ -393,7 +418,7 @@ function json_response($node) {
     file_put_contents($json_path, $json);
 
     // ロック解除
-    if (KEEP_RSS_TEMPORARY_FILES) {
+    if ($GLOBALS['KEEP_RSS_TEMPORARY_FILES']) {
 	ftruncate($fh, 0);
 	rewind($fh);
 	fwrite($fh, $ctx);
@@ -413,7 +438,7 @@ function json_response($node) {
  * MAIN
  */
 
-if (COMPILE_JS) {
+if ($GLOBALS['COMPILE_JS']) {
     minify_script('tinywidget.js', 'tinywidget.min.js');
 }
 

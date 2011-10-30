@@ -11,8 +11,8 @@ all: $(DIRS) tinywidget.min.js
 $(DIRS):
 	mkdir -p $@
 
-tinywidget.min.js: tinywidget.js
-	php api.php
+tinywidget.min.js: api.php tinywidget.js
+	php api.php -b'false'
 	chmod 666 $@
 
 dist: all
