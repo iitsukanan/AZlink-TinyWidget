@@ -41,7 +41,7 @@ PHP 5.2.16 以上が動作するウェブサーバ（Apache 2.2.9 と nginx 1.0.
 
 == AZlink/Widget から移行する際の注意点
 
-1. JavaScript のファイル名が tinywidget.min.js に変わっています。このスクリプト自体別物です。
+1. JavaScript のファイル名が tinywidget.min.js に変わっています。このスクリプト自体は従来の AZlink/Widget とは別物で、一部オプションに互換性がありません。
 
 2. エントリポイントオブジェクトが AZlink.TinyWidget に変わっています。
 
