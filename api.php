@@ -183,6 +183,16 @@ function forbidden() {
 }
 
 /*
+ * HTTP header
+ */
+function put_json($json) {
+    header('Content-Type: application/json');
+    header('Pragma: no-cache');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    echo $json;
+}
+
+/*
  * $json_path が存在し生存期間内なら出力する
  */
 function put_json_if_available($json_path) {
@@ -197,8 +207,7 @@ function put_json_if_available($json_path) {
     if (strtotime($data->expire) < time())
 	return FALSE;
 
-    header('Content-Type: application/json');
-    file_put_contents($ctx);
+    put_json($ctx);
     return TRUE;
 }
 
@@ -303,8 +312,7 @@ function json_response($node) {
     fclose($lock);
 
     // json を出力
-    header('Content-Type: application/json');
-    echo $json;
+    put_json($json);
 }
 
 // 
