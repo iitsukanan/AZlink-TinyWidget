@@ -2,48 +2,433 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>AZlink/TinyWidget example</title>
-    <script type="text/javascript" src="tinywidget.min.js"></script>
+    <title>AZlink/TinyWidget サンプル</title>
+
     <style type="text/css">
-      .azlink-widget {
-	font-size: 10px;
-	text-align: center;
-	width: 162px;
+      hr {
+	border-top: solid 1px #ccc;
+	border-bottom: none 0;
+	border-left: none 0;
+	border-right: none 0;
+	height: 1px;
+	margin: 1em 0;
       }
-      .azlink-widget a {
-	text-decoration: none;
-	color: #888;
+
+      p {
+	margin: 1em 0;
       }
-      .azlink-widget a img {
-	width: 160px;
-	height: 160px;
-	border: solid 1px #ccc;
+
+      .block {
+	margin: 0 40px;
+	padding: 0 0 1em;
       }
-      .azlink-widget a:hover img {
+
+      .clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	height: 0;
+	visibility: hidden;
+      }
+
+      .clearfix {
+	min-height: 1px;
+      }
+
+      * html .clearfix {
+	height: 1px;
+	/*\*//*/
+	height: auto;
+	overflow: hidden;
+	/**/
+      }
+
+      .left {
+	float: left;
+      }
+
+      .sidebar {
+	float: left;
+	width: 182px;
+      }
+
+      pre.html {
+	font-size: 80%;
+      }
+
+      #parameters {
+	margin: 0 1em 1em;
+	border-collapse: collapse;
+	border-spacing: 0;
+      }
+      #parameters th, #parameters td {
+	padding: 1ex;
 	border: solid 1px #333;
       }
-      .azlink-widget a:hover span {
-	color: #333;
-	text-decoration: underline;
-      }
-      .azlink-widget-item {
-	margin-top: 1em;
-      }
-      .azlink-widget-first-item {
-	margin-top: 0;
-      }
     </style>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <script type="text/javascript" src="tinywidget.js"></script>
   </head>
 
   <body>
-    <h1>AZlink/TinyWidget example</h1>
-    <script type="text/javascript">
-      //<![CDATA[
-      AZlink.TinyWidget.sidebar({
-	node: [ 'new-releases/music', 'bestsellers/videogames' ],
-	numItems: 5
-      });
-      //]]>
-    </script>
+    <h1>AZlink/TinyWidget サンプル</h1>
+
+    <h2>JavaScript の読み込み</h2>
+
+    <p>最初にブログパーツを使用する HTML の &lt;head&gt; タグに tinywidget.min.js を読み込むための &lt;script&gt; タグを追加してください。（以下は /azlink/ にスクリプトを設置した例です。）</p>
+
+    <pre>
+&lt;head&gt;
+  &lt;script type="text/javascript" src="/azlink/tinywidget.min.js"></script>
+&lt;/head&gt;</pre>
+
+    <p>&lt;script&gt; タグを追加した後、HTML &lt;body&gt; 内のブログパーツを設置したい箇所に、以下に説明するブログパーツコードを追加してください。</p>
+
+    <hr>
+
+    <h2>sidebar ブログパーツ</h2>
+
+    <p>縦並び型ブログパーツのサンプルです。AZlink.TinyWidget.sidebar を使用します。</p>
+
+    <div class="block">
+      <hr>
+
+      <p>音楽カテゴリのニューリリース (new-releases/music) から3件表示。</p>
+
+      <div class="clearfix">
+	<div class="sidebar">
+  <script type="text/javascript">
+  //<![CDATA[
+  AZlink.TinyWidget.sidebar({
+    node: 'new-releases/music',
+    numItems: 3
+  });
+  //]]>
+  </script>
+	</div>
+
+	<div class="left">
+	  <b>Script</b>
+<pre>
+  &lt;script type="text/javascript">
+  //&lt;![CDATA[
+  AZlink.TinyWidget.sidebar({
+    associateId: 'Your-Associate-ID',
+    node: 'new-releases/music',
+    numItems: 3
+  });
+  //]]>
+  &lt;/script></pre>
+	</div>
+      </div>
+
+      <hr>
+
+      <p>ビデオゲームベストセラー (bestsellers/videogames) とコミック新着 (new-releases/books/2278488051) をランダムに、詳細情報付きで3件表示。</p>
+
+      <div class="clearfix">
+	<div class="sidebar">
+  <script type="text/javascript">
+  //<![CDATA[
+  AZlink.TinyWidget.sidebar({
+    node: [ 'bestsellers/videogames', 'new-releases/books/2278488051' ],
+    type: 'detail',
+    numItems: 3
+  });
+  //]]>
+  </script>
+	</div>
+
+	<div class="left">
+	  <b>Script</b>
+<pre>
+  &lt;script type="text/javascript">
+  //&lt;![CDATA[
+  AZlink.TinyWidget.sidebar({
+    associateId: 'Your-Associate-ID',
+    node: [ 'bestsellers/videogames', 'new-releases/books/2278488051' ],
+    type: 'detail',
+    numItems: 3
+  });
+  //]]>
+  &lt;/script></pre>
+	</div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>banner ブログパーツ</h2>
+
+    <p>横並び型ブログパーツのサンプルです。AZlink.TinyWidget.banner を使用します。</p>
+
+    <div class="block">
+      <hr>
+      <p>フィギュア・ドールのベストセラー (bestsellers/hobby/2189356051) から順位付きで5件表示。</p>
+
+  <script type="text/javascript">
+  //<![CDATA[
+  AZlink.TinyWidget.banner({
+    node: 'bestsellers/hobby/2189356051',
+    order: true,
+    numItems: 5
+  });
+  //]]>
+  </script>
+
+      <p><b>Script</b></p>
+<pre>
+  &lt;script type="text/javascript">
+  //&lt;![CDATA[
+  AZlink.TinyWidget.sidebar({
+    associateId: 'Your-Associate-ID',
+    node: 'bestsellers/hobby/2189356051',
+    order: true,
+    numItems: 5
+  });
+  //]]>
+  &lt;/script></pre>
+
+      <hr>
+
+      <p>MP3ダウンロード（楽曲）のベストセラー／新着ニューリリース／ヒット商品をランダムに、順位と詳細情報付きで5件表示。</p>
+
+  <script type="text/javascript">
+  //<![CDATA[
+  AZlink.TinyWidget.banner({
+    node: [
+      //'bestsellers/dmusic/digital-music-track',
+      'new-releases/dmusic/digital-music-track',
+      //'movers-and-shakers/dmusic/digital-music-track'
+    ],
+    type: 'detail',
+    order: true,
+    numItems: 5,
+  });
+  //]]>
+  </script>
+
+      <p><b>Script</b></p>
+<pre>
+  &lt;script type="text/javascript">
+  //&lt;![CDATA[
+  AZlink.TinyWidget.sidebar({
+    associateId: 'Your-Associate-ID',
+    node: [
+      'bestsellers/dmusic/digital-music-track',
+      'new-releases/dmusic/digital-music-track',
+      'movers-and-shakers/dmusic/digital-music-track'
+    ],
+    type: 'detail',
+    order: true,
+    numItems: 5
+  });
+  //]]>
+  &lt;/script></pre>
+    </div>
+
+    <hr>
+
+    <h2>ブログパーツパラメータ</h2>
+
+    <p>AZlink.TinyWidget.sidebar と AZlink.TinyWidget.sidebar には以下のパラメータが指定できます。</p>
+
+    <p>associateId は必須（省略しても動きますが）、その他はオプションです。</p>
+
+    <table id="parameters">
+      <tr>
+	<th style="width:7em">パラメータ名</th>
+	<th style="width:6em">型</th>
+	<th>説明</th>
+      </tr>
+      <tr>
+	<th>associateId</th>
+	<td>文字列</td>
+	<td>アソシエイトリンクに埋め込むアソシエイトIDまたはトラッキングIDを指定してください。</td>
+      </tr>
+
+      <tr>
+        <th>node</th>
+	<td>文字列</td>
+	<td>Amazon のベストセラー等と連動した商品を表示する際に、データ取得元のノードIDを指定します。Amazon のベストセラー等のページの URL から gp までを取り除いたものがノードIDとなります。（TV ゲームのベストセラーなら、TV ゲームのベストセラーページ <a href="http://www.amazon.co.jp/gp/bestsellers/videogames">http://www.amazon.co.jp/gp/bestsellers/videogames</a> なら bestsellers/videogames がノードIDです。）<br>
+	このパラメータを省略するとランダムにノードが選択されます。<br>
+	<br>
+	ブログパーツと連動可能なノードは、<a href="http://www.amazon.co.jp/gp/bestsellers">ベストセラー</a>、<a href="http://www.amazon.co.jp/gp/new-releases">新着ニューリリース</a>、<a href="http://www.amazon.co.jp/gp/movers-and-shakers">ヒット商品</a>、<a href="http://www.amazon.co.jp/gp/most-gifted">一番ギフトとして贈られている商品</a>、<a href="http://www.amazon.co.jp/gp/most-wished-for">リストの中で一番ほしい物</a>です。<br>
+	データの連動には Amazon の RSS を使用しています。RSS が存在しないノードについては連動できません。（特にトップノードは連動できませんのでご注意ください。）<br>
+	<br>
+	ノードIDには下位ノードを指定することもできます。例えばゲームのベストセラーには下位ノードとしてプレイステーション3（http://www.amazon.co.jp/gp/bestsellers/videogames/15782591）等があり、node パラメータに "bestsellers/videogames/15782591" を指定するとプレイステーション3のベストセラーと連動したブログパーツとなります。<br>
+	<br>
+	Amazon でベストセラーページを巡回していると、URL の末尾に /ref= 形式のアクセス元識別子が付くことがありますが、ノードIDにアクセス元識別子は不要ですので余分な部分は指定しないようにしてください。（動きません。）
+	</td>
+      </tr>
+
+      <tr>
+	<th>type</th>
+	<td>文字列</td>
+	<td>simple または detail のいずれかを指定してください。simple を指定すると画像と商品名のリンクが表示されます。detail を指定すると価格等の詳細情報も表示されます。<br>
+	省略時は simple になります。
+	</td>
+      </tr>
+
+      <tr>
+	<th>numItems</th>
+	<td>整数</td>
+	<td>表示する商品の最大個数を 1 〜 10 の間で指定します。省略した場合は 10 となります。</td>
+      </tr>
+
+      <tr>
+	<th>imageFlags</th>
+	<td>文字列または文字列の配列</td>
+	<td>Amazon の画像に指定するオプションを配列で指定してください。例えば<code>[ 'AA600', 'CR200,50,200,300' ]</code>と指定すると 600px 正方形の画像をオフセット 200,50 サイズ 200x300px でクリッピングとなります。<br>
+	省略時は<code>[ 'AA160' ]</code>となります。<br>
+	オプションに指定可能な値は、<a href="http://shizlabs.amonya.com/amazon/image-uri01.html">Amazon商品画像のカスタマイズ（理論編） - Shiz Labs</a> などを参照してください。こちらのページに書かれているとおり Amazon の画像に複数のオプションを指定する際は _ で区切っていますが、同じ形式の文字列をこのパラメータに指定しても有効です。（<code>[ 'AA600', 'CR200,50,200,300' ]</code> は '_AA600_CR200,50,200,300_' と同じ意味になります。）
+        </td>
+      </tr>
+    </table>
+
+    <hr>
+
+    <h2>AZlink.TinyWidget.api を使用したカスタマイズ</h2>
+
+    <p>AZlink.TinyWidget.sidebar と AZlink.TinyWidget.sidebar を呼び出した後、実際の処理は AZlink.TinyWidget.api が行います。</p>
+
+    <p>この関数の onload コールバックに自前のフォーマット関数を指定することで、より高度なカスタマイズが行えます。詳しくはソースをご覧ください。</p>
+
+    <hr>
+
+    <h2>CSS によるデザインのカスタマイズ</h2>
+
+    <p>ブログパーツの生成する HTML には以下の例のようにクラス属性が指定されます。CSS を指定してデザインをカスタマイズしてください。</p>
+
+    <p>このサンプルのブログパーツのデザインは、<a href="styles.css">styles.css</a> で指定しています。適当にコピペして使ってください。</p>
+
+    <div class="block">
+      <hr>
+      <h3>サイドバー</h3>
+
+      <p>サイドバー型ブログパーツには、最上位要素に azlink-widget と azlink-sidebar-widget、各アイテムに azlink-widget-item と azlink-sidebar-widget-item クラスが指定されます。</p>
+
+      <p>その他のクラスについては以下のブログパーツ出力例を参考にしてください。（赤字のクラスは最初または最後の要素のみに付与されます。）</p>
+
+	<pre class="html">
+&lt;div class="azlink-widget azlink-sidebar-widget"&gt;
+  &lt;div class="azlink-widget-item azlink-sidebar-widget-item <span style="color:red">azlink-widget-first-item azlink-sidebar-widget-first-item</span>"&gt;
+    &lt;a target="_blank" class="azlink-widget-associate-link"
+       href="http://www.amazon.co.jp/exec/obidos/ASIN/B00361FKX2/[ASSOCIATE_ID]/ref=nosim/"&gt;
+      &lt;img alt="" class="azlink-widget-image" src="http://ecx.images-amazon.com/images/I/619c7ZMH6XL._AA160_.jpg"&gt;
+      &lt;br&gt;
+      &lt;span class="azlink-widget-title"&gt;
+        &lt;b&gt;1位&lt;/b&gt;
+        モンスターハンター フロンティア オンライン ビギナーズパッケージ(オンライン専用)
+        (初回特典: 武器のガンランス「ワイヴェンボルト」が入手できるイベントコード同梱)
+      &lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class="azlink-widget-item azlink-sidebar-widget-item"&gt;
+    &lt;a target="_blank" class="azlink-widget-associate-link"
+       href="http://www.amazon.co.jp/exec/obidos/ASIN/B002XUM5PS/[ASSOCIATE_ID]/ref=nosim/"&gt;
+      &lt;img alt="" class="azlink-widget-image" src="http://ecx.images-amazon.com/images/I/61KmwM1ogML._AA160_.jpg"&gt;
+      &lt;br&gt;
+      &lt;span class="azlink-widget-title"&gt;
+        &lt;b&gt;2位&lt;/b&gt;
+        ときめきメモリアル Girls Side 3rd Story
+      &lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class="azlink-widget-item azlink-sidebar-widget-item <span style="color:red">azlink-widget-last-item azlink-sidebar-widget-last-item</span>"&gt;
+    &lt;a target="_blank" class="azlink-widget-associate-link"
+       href="http://www.amazon.co.jp/exec/obidos/ASIN/B003DZ03B0/[ASSOCIATE_ID]/ref=nosim/"&gt;
+      &lt;img alt="" class="azlink-widget-image" src="http://ecx.images-amazon.com/images/I/51TfR1Gz%2B0L._AA160_.jpg"&gt;
+      &lt;br&gt;
+      &lt;span class="azlink-widget-title"&gt;
+        &lt;b&gt;3位&lt;/b&gt;
+        ラブプラス+
+      &lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+      <hr>
+
+      <h3>バナー</h3>
+
+      <p>バナー型ブログパーツの場合、最上位要素に azlink-widget と
+    azlink-banner-widget、各アイテムに azlink-widget-item と
+    azlink-banner-widget-item クラスが指定されます。その他のクラスについては以下
+の例を参考にしてください。</p>
+
+      <p>その他のクラスについては以下のブログパーツ出力例を参考にしてください。（赤字のクラスは最初または最後の要素のみに付与されます。）</p>
+
+      <pre class="html">
+&lt;table class="azlink-widget azlink-banner-widget"&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td class="azlink-widget-item azlink-banner-widget-item <span style="color:red">azlink-widget-first-item azlink-banner-widget-first-item</span>"&gt;
+        &lt;a target="_blank" class="azlink-widget-associate-link"
+           href="http://www.amazon.co.jp/exec/obidos/ASIN/B00361FKX2/[ASSOCIATE_ID]/ref=nosim/"&gt;
+          &lt;img alt="" class="azlink-widget-image" src="http://ecx.images-amazon.com/images/I/619c7ZMH6XL._AA160_.jpg"&gt;
+          &lt;br&gt;
+          &lt;span class="azlink-widget-title"&gt;
+            &lt;b&gt;1位&lt;/b&gt;
+            モンスターハンター フロンティア オンライン ビギナーズパッケージ(オンライン専用)
+            (初回特典: 武器のガンランス「ワイヴェンボルト」が入手できるイベントコード同梱)
+          &lt;/span&gt;
+        &lt;/a&gt;
+      &lt;/td&gt;
+      &lt;td class="azlink-widget-item azlink-banner-widget-item"&gt;
+        &lt;a target="_blank" class="azlink-widget-associate-link"
+           href="http://www.amazon.co.jp/exec/obidos/ASIN/B002XUM5PS/[ASSOCIATE_ID]/ref=nosim/"&gt;
+          &lt;img alt="" class="azlink-widget-image" src="http://ecx.images-amazon.com/images/I/61KmwM1ogML._AA160_.jpg"&gt;
+          &lt;br&gt;
+          &lt;span class="azlink-widget-title"&gt;
+            &lt;b&gt;2位&lt;/b&gt;
+            ときめきメモリアル Girls Side 3rd Story
+          &lt;/span&gt;
+        &lt;/a&gt;
+      &lt;/td&gt;
+      &lt;td class="azlink-widget-item azlink-banner-widget-item <span style="color:red">azlink-widget-last-item azlink-banner-widget-last-item</span>"&gt;
+        &lt;a target="_blank" class="azlink-widget-associate-link"
+           href="http://www.amazon.co.jp/exec/obidos/ASIN/B003DZ03B0/[ASSOCIATE_ID]/ref=nosim/"&gt;
+          &lt;img alt="" class="azlink-widget-image" src="http://ecx.images-amazon.com/images/I/51TfR1Gz%2B0L._AA160_.jpg"&gt;
+          &lt;br&gt;
+          &lt;span class="azlink-widget-title"&gt;
+            &lt;b&gt;3位&lt;/b&gt;
+            ラブプラス+
+          &lt;/span&gt;
+        &lt;/a&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+
+      <hr>
+
+      <h3>詳細表示</h3>
+
+      <p>type: "detail" を指定して詳細表示を行う場合、各商品の詳細情報には以下の例のようにクラス属性が付与されます。</p>
+
+      <p>azlink-widget-new-item クラスは未発売の商品にのみ付与されます。</p>
+
+      <pre class="html">
+&lt;a target="_blank" class="azlink-widget-associate-link"
+   href="http://www.amazon.co.jp/exec/obidos/ASIN/B0040GJQQ4/[ASSOCIATE_ID]/ref=nosim/">
+  &lt;img alt="" class="azlink-widget-image" src="http://ecx.images-amazon.com/images/I/617dAx1W2cL.09._AA160_.jpg">&lt;br>
+  &lt;span class="azlink-widget-title">【特典生写真付き】Beginner(Type-A)(イベント参加券入り 初回完全限定生産盤)(DVD付)&lt;/span>
+&lt;/a>
+&lt;span class="azlink-widget-iteminfo">AKB48&lt;/span>
+&lt;span class="azlink-widget-iteminfo">キングレコード&lt;/span>
+&lt;span class="azlink-widget-date <span style="color:red">azlink-widget-new-item</span>">2010/10/27&lt;/span>
+&lt;span class="azlink-widget-price">1,395円&lt;/span></pre>
+
+    </div>
+
+    <hr>
+
+    <div class="footer">
+      <address>
+	Copyright &copy; 2011 <a href="http://sakuratan.biz/azlink/">AZlink</a> by <a href="http://sakuratan.biz/">sakuratan.biz</a>
+      </address>
+    </div>
   </body>
 </html>

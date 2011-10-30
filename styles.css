@@ -1,0 +1,54 @@
+.azlink-widget {
+	font-size: 10px;
+	width: 162px;
+}
+
+.azlink-widget a {
+	text-decoration: none;
+	color: #888;
+}
+
+.azlink-widget span {
+	color: #888;
+}
+
+.azlink-widget a img {
+	width: 160px;
+	height: 160px;
+	border: solid 1px #ccc;
+}
+
+.azlink-widget a span b {
+	color: #333;
+}
+
+.azlink-widget a:hover img {
+	border: solid 1px #333;
+}
+
+.azlink-widget a:hover span {
+	color: #333;
+	text-decoration: underline;
+}
+
+.azlink-widget-new-item {
+	color: maroon !important;
+	font-weight: bold;
+}
+
+/* For sidebar */
+
+.azlink-sidebar-widget-item {
+	margin-top: 1em;
+}
+
+.azlink-sidebar-widget-first-item {
+	margin-top: 0;
+}
+
+/* For banner */
+
+.azlink-banner-widget-item {
+	vertical-align: top;
+	text-align: center;
+}
