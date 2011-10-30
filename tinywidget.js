@@ -147,7 +147,9 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	}
 
 	// item を HTML にフォーマット
-	function add_item(target, item, opts) {
+	function add_item(target, items, index, opts) {
+	    var item = items[index];
+
 	    var anchor = document.createElement('a');
 	    anchor.href = item.link;
 	    anchor.className = 'azlink-widget-associate-link';
@@ -164,12 +166,22 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	    img.title = item.title;
 	    img.className = 'azlink-widget-image';
 
-
 	    anchor.appendChild(img);
 	    append_br(anchor);
-	    append_text(anchor, item.title);
 
-	    if (!(opts.type && opts.type == 'detail')) {
+	    var span = document.createElement('span');
+	    span.className = 'azlink-widget-title';
+	    if (opts.order) {
+		var b = document.createElement('b');
+		append_text(b, (index + 1) + '位');
+		span.appendChild(b);
+		append_text(span, ' ');
+	    }
+	    append_text(span, item.title);
+
+	    anchor.appendChild(span);
+
+	    if (!opts.type || opts.type != 'detail') {
 		target.appendChild(anchor);
 		return;
 	    }
@@ -204,7 +216,14 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 
 	    if (item.date) {
 		var span = document.createElement('span');
-		span.className = 'azlink-widget-date';
+
+		var today = new Date(), dp = item.date.split('-');
+		var dt = new Date(parseInt(dp[0]), parseInt(dp[1]) - 1, parseInt(dp[2]));
+		if (dt > today) {
+		    span.className = 'azlink-widget-date azlink-widget-new-item';
+		} else {
+		    span.className = 'azlink-widget-date';
+		}
 		var ymd = item.date.replace(/-/g, '/');
 		append_text(span, ymd);
 		nodes.push(span);
@@ -259,7 +278,7 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 		    elem.className += ' azlink-widget-first-item azlink-sidebar-widget-first-item';
 		if (i == items.length - 1)
 		    elem.className += ' azlink-widget-last-item azlink-sidebar-widget-last-item';
-		add_item(elem, items[i], opts);
+		add_item(elem, items, i, opts);
 		wrapper.appendChild(elem);
 	    }
 
@@ -282,7 +301,7 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 		    elem.className += ' azlink-widget-first-item azlink-banner-widget-first-item';
 		if (i == items.length - 1)
 		    elem.className += ' azlink-widget-last-item azlink-banner-widget-last-item';
-		add_item(elem, items[i], opts);
+		add_item(elem, items, i, opts);
 		wrapper.appendChild(elem);
 	    }
 
@@ -346,7 +365,7 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	    if (!(opts.node)) {
 		node = node_random();
 	    } else if (typeof(opts.node) == 'string') {
-		node = opts.node();
+		node = opts.node;
 	    } else {
 		node = opts.node[rand_int(opts.node.length)];
 	    }
