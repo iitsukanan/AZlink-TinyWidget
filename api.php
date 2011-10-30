@@ -51,7 +51,7 @@ define('JS_JSON_UPDATE_PROBARILITY', 1.0);
 // 置く場合は /widget/ になります。
 define('JS_BASEURI', NULL);
 
-// true なら RSS テンポラリファイルを残す、デバッグ用
+// true なら RSS テンポラリファイルを残す（どちらかと言えばデバッグ用）
 define('KEEP_RSS_TEMPORARY_FILES', false);
 
 // 
@@ -109,14 +109,14 @@ function parse_rss_string($ctx) {
 	    $html = (string)($item->description);
 
 	    // 最初の img タグが画像
-	    if (preg_match('/<img src="(.*?)"/', $html, $mo)) {
+	    if (preg_match('/<img\s+src="(.*?)"/', $html, $mo)) {
 		$datum['image'] = reset_image_flags($mo[1]);
 	    }
 
 	    foreach (preg_split(',<br\s*/?>,', $html) as $line) {
 		// 作者とか
-		if (preg_match(',<span class="riRssContributor">(.*)</span>,', $line)) {
-		    foreach (preg_split(',<span class=["\']byLinePipe["\']>\|</span>,', $line) as $s) {
+		if (preg_match(',<span class="riRssContributor">\s*(.*)\s*</span>,', $line)) {
+		    foreach (preg_split(',<span class=["\']byLinePipe["\']>\s*\|\s*</span>,', $line) as $s) {
 			if (!isset($datum['info'])) {
 			    $datum['info'] = array();
 			}
@@ -126,15 +126,15 @@ function parse_rss_string($ctx) {
 		}
 
 		// 新品の値段
-		if (preg_match('/新品&#65306;/u', $line)) {
-		    if (preg_match('|<strike>￥\s*([\d,]+)</strike>|u', $line, $mo)) {
+		if (preg_match('/(?:新品|ダウンロード)&#65306;/u', $line)) {
+		    if (preg_match('|<strike>\s*￥\s*([\d,]+)\s*</strike>|u', $line, $mo)) {
 			$datum['list_price'] = cleanup_html_number($mo[1]);
 		    }
 
-		    if (preg_match('|<b>￥\s*([\d,]+)\s*-\s*￥\s*([\d,]+)</b>|u', $line, $mo)) {
+		    if (preg_match('|<b>\s*￥\s*([\d,]+)\s*-\s*￥\s*([\d,]+)\s*</b>|u', $line, $mo)) {
 			$datum['lower_new_price'] = cleanup_html_number($mo[1]);
 			$datum['upper_new_price'] = cleanup_html_number($mo[2]);
-		    } elseif (preg_match('|<b>￥\s*([\d,]+)</b>|u', $line, $mo)) {
+		    } elseif (preg_match('|<b>\s*￥\s*([\d,]+)\s*</b>|u', $line, $mo)) {
 			$datum['new_price'] = cleanup_html_number($mo[1]);
 			if (!isset($datum['list_price']) && isset($datum['new_price'])) {
 			    $datum['list_price'] = $datum['new_price'];
@@ -144,13 +144,13 @@ function parse_rss_string($ctx) {
 		}
 
 		// 中古品の値段
-		if (preg_match('|中古品を見る.*<span class="price">￥\s*([\d,]+)</span>|u', $line, $mo)) {
+		if (preg_match('|中古品を見る.*<span class="price">\s*￥\s*([\d,]+)\s*</span>|u', $line, $mo)) {
 		    $datum['used_price'] = cleanup_html_number($mo[1]);
 		    continue;
 		}
 
 		// ゲームのプラットフォーム
-		if (preg_match(',<b>プラットフォーム:</b>(.*)$,', $line, $mo)) {
+		if (preg_match(',<b>プラットフォーム\s*:\s*</b>(.*)$,', $line, $mo)) {
 		    $datum['platform'] = cleanup_html_string($mo[1]);
 		    if (preg_match('/<img src="(.*?)"/', $mo[1], $mo)) {
 			$datum['platform_image'] = cleanup_html_string($mo[1]);
@@ -158,10 +158,10 @@ function parse_rss_string($ctx) {
 		}
 
 		// 発売日かリリース日
-		if (preg_match(',発売日: (\d+/\d+/\d+),u', $line, $mo)) {
+		if (preg_match(',発売日\s*:\s*(\d+/\d+/\d+),u', $line, $mo)) {
 		    $datum['date'] = cleanup_html_date($mo[1]);
 		    continue;
-		} elseif (preg_match(',出版年月: (\d+/\d+/\d+),u', $line, $mo)) {
+		} elseif (preg_match(',出版年月\s*:\s*(\d+/\d+/\d+),u', $line, $mo)) {
 		    $datum['date'] = cleanup_html_date($mo[1]);
 		    continue;
 		}
