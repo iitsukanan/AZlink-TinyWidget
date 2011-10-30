@@ -1,6 +1,6 @@
 PYTHON=		python
 
-VERS=		1.0.1
+VERS=		1.0.2
 DISTNAME=	azlink-tinywidget-$(VERS)
 DIST=		$(DISTNAME).zip
 DIRS=		json
