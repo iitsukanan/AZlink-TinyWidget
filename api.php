@@ -223,7 +223,7 @@ function json_response($node) {
     }
 
     // rss を読み込む準備
-    if (!mkdir_p($GLOBALS['WORK_DIR'])) {
+    if (!mkdir_p($GLOBALS['WORK_DIR'], $GLOBALS['DIR_PERMS'])) {
 	forbidden();
 	exit(1);
     }
@@ -270,12 +270,13 @@ function json_response($node) {
     }
 
     // json を出力
-    if (!mkdir_p(dirname($json_path))) {
+    if (!mkdir_p(dirname($json_path), $GLOBALS['DIR_PERMS'])) {
 	forbidden();
 	exit(1);
     }
     $json = json_encode(parse_rss_string($ctx));
     file_put_contents($json_path, $json);
+    @chmod($json_path, $GLOBALS['FILES_PERMS']);
 
     // ロック解除
     if ($GLOBALS['KEEP_RSS_TEMPORARY_FILES']) {
@@ -300,6 +301,7 @@ function json_response($node) {
 
 // node パラメータがあれば JSON 出力
 if (isset($_GET['node']) && $_GET['node']) {
+    umask(0);
     json_response($_GET['node']);
 }
 

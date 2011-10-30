@@ -13,6 +13,12 @@ $JSON_CACHE_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'json';
 // 作業用ディレクトリ
 $WORK_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'work';
 
+// 作成するディレクトリのパーミッション
+$DIR_PERMS = 0777;
+
+// 作成するファイルのパーミッション
+$FILES_PERMS = 0666;
+
 // JSON キャッシュの生存期間（秒）
 $JSON_CACHE_LIFETIME = 3600 * 2;
 
