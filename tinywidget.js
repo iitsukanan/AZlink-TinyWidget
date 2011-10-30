@@ -342,8 +342,14 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 
 	widget.api = function(opts) {
 	    // node パラメータは必須
-	    if (!(opts.node))
-		opts.node = node_random();
+	    var node;
+	    if (!(opts.node)) {
+		node = node_random();
+	    } else if (typeof(opts.node) == 'string') {
+		node = opts.node();
+	    } else {
+		node = opts.node[rand_int(opts.node.length)];
+	    }
 
 	    // imageFlags のデフォルトは 'AA160'
 	    if (typeof(opts.imageFlags) == 'undefined')
@@ -403,8 +409,8 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	     * cron を使わなくて済むようにするのが目的。
 	     */
 
-	    var json_url = widget.baseuri + 'json/' + opts.node + '.js';
-	    var api_url = widget.baseuri + 'api.php?node=' + encodeURIComponent(opts.node);
+	    var json_url = widget.baseuri + 'json/' + node + '.js';
+	    var api_url = widget.baseuri + 'api.php?node=' + encodeURIComponent(node);
 
 	    ajax_json(json_url, function(retval, status) {
 		if (status == 404) {

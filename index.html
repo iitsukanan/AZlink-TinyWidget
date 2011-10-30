@@ -39,11 +39,10 @@
     <h1>AZlink/TinyWidget example</h1>
     <script type="text/javascript">
       //<![CDATA[
-      AZlink.TinyWidget.sidebar();
-      /*
-	//node: 'new-releases/music',
+      AZlink.TinyWidget.sidebar({
+	node: [ 'new-releases/music', 'bestsellers/videogames' ],
+	numItems: 5
       });
-      */
       //]]>
     </script>
   </body>
