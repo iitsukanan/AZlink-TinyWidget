@@ -26,50 +26,19 @@
  * 設定
  */
 
-global $JSON_CACHE_DIR, $WORK_DIR, $JSON_CACHE_LIFETIME, $COMPILE_JS,
-       $JSON_UPDATE_PROBARILITY, $API_BASEURI, $KEEP_RSS_TEMPORARY_FILES;
+global $JSON_CACHE_DIR, $WORK_DIR, $JSON_CACHE_LIFETIME,
+       $JSON_UPDATE_PROBARILITY, $KEEP_RSS_TEMPORARY_FILES;
 
 // デフォルト値のセット
 // 詳細は config.php.example 参照
 $JSON_CACHE_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'json';
 $WORK_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'work';
 $JSON_CACHE_LIFETIME = 3600;
-$COMPILE_JS = true;
 $JSON_UPDATE_PROBARILITY = 1.0;
-$API_BASEURI = NULL;
 $KEEP_RSS_TEMPORARY_FILES = false;
 
 // config.php を読み込む
 @include 'config.php';
-
-// cli 起動時はコマンドラインオプションも読み込む
-if (php_sapi_name() == 'cli') {
-    foreach (getopt('c:w:l:j:p:b:k:') as $opt => $arg) {
-	switch ($opt) {
-	case 'c':
-	    $JSON_CACHE_DIR = $arg;
-	    break;
-	case 'w':
-	    $WORK_DIR = $arg;
-	    break;
-	case 'l':
-	    $JSON_CACHE_LIFETIME = (float)$arg;
-	    break;
-	case 'j':
-	    $COMPILE_JS = ($arg == 'false' ? false : true);
-	    break;
-	case 'p':
-	    $JSON_UPDATE_PROBARILITY = (float)$arg;
-	    break;
-	case 'b':
-	    $API_BASEURI = ($arg == 'false' ? '' : ($arg == 'null' ? NULL : $arg));
-	    break;
-	case 'k':
-	    $KEEP_RSS_TEMPORARY_FILES = ($arg == 'false' ? false : true);
-	    break;
-	}
-    }
-}
 
 // 
 
@@ -191,6 +160,7 @@ function parse_rss_string($ctx) {
     return array(
 	'items' => $items,
 	'expire' => gmdate('r', time() + $GLOBALS['JSON_CACHE_LIFETIME']),
+	'probarility' => $GLOBALS['JSON_UPDATE_PROBARILITY'],
     );
 }
 
@@ -206,93 +176,6 @@ function mkdir_p($dir, $mode=0777) {
 	}
     }
     return TRUE;
-}
-
-// 
-
-function minify_script() {
-    $src = 'tinywidget.min.js.in';
-    $dest = 'tinywidget.min.js';
-
-    if (file_exists($dest)) {
-	// タイムスタンプを比較
-	$mtime = filemtime($dest);
-	if (filemtime($src) <= $mtime && filemtime(__file__) <= $mtime) {
-	    return;
-	}
-    }
-
-    // ロックする
-    $lock_path = $GLOBALS['WORK_DIR'] . DIRECTORY_SEPARATOR . 'minify.lock';
-    $lock = fopen($lock_path, 'w+');
-    if (!flock($lock, LOCK_EX)) {
-	exit(1);
-    }
-    fwrite($lock, "0\n");	// For NFS
-    fflush($lock);
-
-    // もう一度タイムスタンプをチェック
-    clearstatcache();
-    if (file_exists($dest)) {
-	$mtime = filemtime($dest);
-	if (filemtime($src) <= $mtime && filemtime(__file__) <= $mtime) {
-	    @unlink($lock_path);
-	    fclose($lock);
-	    return;
-	}
-    }
-
-    // 現在の設定値を読み込む
-    $lines = @file($dest);
-    if ($lines === FALSE) {
-	@unlink($lock_path);
-	fclose($lock);
-	return;
-    }
-    $opts = array();
-    foreach ($lines as $line) {
-	if (preg_match('/^AZlink\.TinyWidget\.(\w+)=(.*);$/', $line, $mo)) {
-	    $opts[$mo[1]] = json_decode($mo[2]);
-	}
-    }
-
-    // PHP の設定と比較
-    $changed = false;
-
-    if (is_null($GLOBALS['API_BASEURI'])) {
-	if (isset($_SERVER['PHP_SELF'])) {
-	    $re = '/' . preg_quote(basename(__file__), '/') . '$/';
-	    $baseuri = preg_replace($re, '', $_SERVER['PHP_SELF']);
-	} else {
-	    $baseuri = '';
-	}
-    } else {
-	$baseuri = $GLOBALS['API_BASEURI'];
-    }
-
-    if (!isset($opts['baseuri']) || $opts['baseuri'] != $baseuri) {
-	$changed = true;
-    }
-
-    if (!isset($opts['jsonUpdateProbability']) ||
-	$opts['jsonUpdateProbability'] != $GLOBALS['JSON_UPDATE_PROBARILITY']) {
-	$changed = true;
-    }
-
-    if ($changed) {
-	$ctx = file($src);
-	for ($i = 0; $i < count($ctx); ++$i) {
-	    $ctx[$i] = rtrim($ctx[$i]);
-	}
-	$ctx[] = "AZlink.TinyWidget.baseuri=" . json_encode($baseuri) . ";";
-	$ctx[] = "AZlink.TinyWidget.jsonUpdateProbability=" . json_encode($GLOBALS['JSON_UPDATE_PROBARILITY']) . ";";
-	file_put_contents($dest, implode("\n", $ctx));
-    } else {
-	touch($dest);
-    }
-
-    @unlink($lock_path);
-    fclose($lock);
 }
 
 // 
@@ -419,10 +302,6 @@ function json_response($node) {
 /*
  * MAIN
  */
-
-if ($GLOBALS['COMPILE_JS']) {
-    minify_script();
-}
 
 // node パラメータがあれば JSON 出力
 if (isset($_GET['node']) && $_GET['node']) {

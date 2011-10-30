@@ -4,11 +4,10 @@ VERS=		1.0.0
 DISTNAME=	azlink-tinywidget-$(VERS)
 DIST=		$(DISTNAME).zip
 DIRS=		json
-DISTFILES=	api.php config.php.example \
-		tinywidget.min.js.in tinywidget.min.js \
+DISTFILES=	api.php config.php.example tinywidget.min.js \
 		styles.css index.html work/.htaccess
 
-.PHONY: all dist distclean
+.PHONY: all clean dist distclean
 
 all: $(DIRS) tinywidget.min.js
 	@chmod 777 $(DIRS)
@@ -16,12 +15,12 @@ all: $(DIRS) tinywidget.min.js
 $(DIRS):
 	mkdir -p $@
 
-tinywidget.min.js: tinywidget.min.js.in
-	cp tinywidget.min.js.in tinywidget.min.js
-	chmod 666 $@
-
-tinywidget.min.js.in: api.php tinywidget.js
+tinywidget.min.js: compile.py tinywidget.js
 	$(PYTHON) compile.py tinywidget.js $@
+
+clean:
+	rm -f tinywidget.min.js
+	rm -rf $(DIRS)
 
 dist: all
 	rm -rf $(DIST) $(DISTNAME)
@@ -31,5 +30,5 @@ dist: all
 	zip -qX -r $(DIST) $(DISTNAME)/*
 	rm -rf $(DISTNAME)
 
-distclean:
-	rm -rf $(DIST) $(DIRS) tinywidget.min.js
+distclean: clean
+	rm -rf $(DIST)

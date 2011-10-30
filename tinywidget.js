@@ -25,12 +25,24 @@ if (typeof(AZlink) == 'undefined') {
 }
 
 if (typeof(AZlink.TinyWidget) == 'undefined') {
-    AZlink.TinyWidget = {
-	baseuri: '',
-	jsonUpdateProbability: 1.0
-    };
+    AZlink.TinyWidget = {};
 
     (function(widget) {
+	/*
+	 * baseuri を探す
+	 */
+	var baseuri = (function() {
+	    var ret, scripts;
+	    if (document.getElementsByTagName)
+		scripts = document.getElementsByTagName('script');
+	    else if (document.scripts)
+		scripts = document.scripts;
+	    if (scripts)
+		ret = scripts[scripts.length-1].src
+		    .replace(/[#\?].*$/, '').replace(/[^\/]*$/, '');
+	    return ret;
+	})();
+
 	/*
 	 * サブルーチン／ユーティリティクラス
 	 */
@@ -360,6 +372,9 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	}
 
 	widget.api = function(opts) {
+	    if (typeof(baseuri) == 'undefined')
+		return;
+
 	    // node パラメータは必須
 	    var node;
 	    if (!(opts.node)) {
@@ -423,13 +438,13 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	     * NOTE
 	     * json_url が 404 なら api_url を呼び出す。
 	     * JSON の取得に成功した場合、expire を経過していれば
-	     * jsonUpdateProbability の確率で api_url を呼び出してファイルを
+	     * probability の確率で api_url を呼び出してファイルを
 	     * 更新させる。
 	     * cron を使わなくて済むようにするのが目的。
 	     */
 
-	    var json_url = widget.baseuri + 'json/' + node + '.js';
-	    var api_url = widget.baseuri + 'api.php?node=' + encodeURIComponent(node);
+	    var json_url = baseuri + 'json/' + node + '.js';
+	    var api_url = baseuri + 'api.php?node=' + encodeURIComponent(node);
 
 	    ajax_json(json_url, function(retval, status) {
 		if (status == 404) {
@@ -437,7 +452,7 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 
 		} else {
 		    if (retval && retval.expire &&
-			Math.random() <= 0.0 + widget.jsonUpdateProbability) {
+			Math.random() <= parseFloat(retval.probability)) {
 			var expire = new Date(retval.expire);
 			var now = new Date();
 			if (expire.getTime() < now.getTime()) {
@@ -458,6 +473,9 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 
 	// ブログパーツを埋め込む
 	function embed_blogparts(opts) {
+	    if (typeof(baseuri) == 'undefined')
+		return;
+
 	    // ブログパーツ置換用スタブ要素を document.write
 	    var id = 'azlink-widget-embed-stub-' + (index++);
 	    document.write('<span id="' + id + '" style="display:none"></span>');
