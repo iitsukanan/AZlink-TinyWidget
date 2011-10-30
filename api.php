@@ -26,9 +26,6 @@
  * 設定
  */
 
-global $JSON_CACHE_DIR, $WORK_DIR, $JSON_CACHE_LIFETIME,
-       $JSON_UPDATE_PROBARILITY, $KEEP_RSS_TEMPORARY_FILES;
-
 // デフォルト値を読み込む
 require_once 'config.php.defaults';
 
