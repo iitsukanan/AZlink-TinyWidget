@@ -227,6 +227,31 @@ function json_response($node) {
 	forbidden();
 	exit(1);
     }
+
+    // RSS の読み込みはシリアライズする
+    $lock = fopen($GLOBALS['WORK_DIR'] . DIRECTORY_SEPARATOR . 'rss.lock', 'wb');
+    if (!$lock) {
+	forbidden();
+	exit(1);
+    }
+
+    // ロック
+    if (!flock($lock, LOCK_EX)) {
+	forbidden();
+	exit(1);
+    }
+    // for NFS
+    rewind($lock);
+    fwrite($lock, "0");
+    fflush($lock);
+
+    // flock してからファイルが更新されていれば出力して終わり
+    if (put_json_if_available($json_path)) {
+	fclose($lock);
+	exit(0);
+    }
+
+    // 出力ファイル (RSS) をオープン
     $rss_path = $GLOBALS['WORK_DIR'] . DIRECTORY_SEPARATOR . rawurlencode($node);
     $fh = fopen($rss_path, "wb");
     if (!$fh) {
@@ -234,19 +259,12 @@ function json_response($node) {
 	exit(1);
     }
 
-    // ロック
+    // 一応ロックする
     if (!flock($fh, LOCK_EX)) {
 	forbidden();
 	exit(1);
     }
     rewind($fh);
-    fwrite($fh, "0");
-
-    // flock してからファイルが更新されていれば出力して終わり
-    if (put_json_if_available($json_path)) {
-	fclose($fh);
-	exit(0);
-    }
 
     // CURL で RSS を読み込む
     $ch = curl_init("http://www.amazon.co.jp/rss/{$node}");
@@ -256,7 +274,6 @@ function json_response($node) {
     if ($ctx === FALSE) {
 	curl_close($ch);
 	@unlink($rss_path);
-	fclose($fh);
 	forbidden();
 	exit(1);
     }
@@ -264,29 +281,29 @@ function json_response($node) {
     curl_close($ch);
     if ($code != 200) {
 	@unlink($rss_path);
-	fclose($fh);
 	forbidden();
 	exit(1);
     }
 
     // json を出力
     if (!mkdir_p(dirname($json_path), $GLOBALS['DIR_PERMS'])) {
+	@unlink($rss_path);
 	forbidden();
 	exit(1);
     }
     $json = json_encode(parse_rss_string($ctx));
     file_put_contents($json_path, $json);
-    @chmod($json_path, $GLOBALS['FILES_PERMS']);
+    chmod($json_path, $GLOBALS['FILES_PERMS']);
 
     // ロック解除
     if ($GLOBALS['KEEP_RSS_TEMPORARY_FILES']) {
-	ftruncate($fh, 0);
-	rewind($fh);
 	fwrite($fh, $ctx);
+	chmod($rss_path, $GLOBALS['FILES_PERMS']);
     } else {
 	@unlink($rss_path);
     }
     fclose($fh);
+    fclose($lock);
 
     // json を出力
     header('Content-Type: application/json');
