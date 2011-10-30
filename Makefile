@@ -4,7 +4,7 @@ VERS=		1.0.0
 DISTNAME=	azlink-tinywidget-$(VERS)
 DIST=		$(DISTNAME).zip
 DIRS=		json
-DISTFILES=	api.php config.php.example tinywidget.min.js \
+DISTFILES=	api.php config.php.defaults tinywidget.min.js \
 		styles.css index.html work/.htaccess
 
 .PHONY: all clean dist distclean

@@ -27,13 +27,13 @@ Amazon のベストセラーや新着ニューリリースと連動したブロ�
 
 == 設定
 
-スクリプトの設定は config.php に記述します。インストールした状態では config.php は存在しませんので、設定前に config.php.examples を config.php にコピーしてください。
+スクリプトの設定は config.php に記述してください。
 
-  cp config.php.examples config.php
+インストールした状態では config.php は存在しませんので、設定値を変更する際は config.php.defaults を config.php にコピーし、config.php に設定を記述してください。（バージョンアップ等でアーカイブから上書きした場合に config.php も更新しないように config.php を配布対象から外しています。）
 
-設定可能な項目は config.php.examples に記載しています。
+  cp config.php.defaults config.php
 
-config.php の一部の値は tinywidget.min.js にコピーされます。このコピー処理は api.php で行われますが、主に負荷を下げる目的で JavaScript からできるだけ api.php の呼び出さないよう実装しています。config.php の設定をすぐ適用したい場合、api.php をブラウザから直接呼び出してください。特に何も表示されませんが、tinywidget.min.js 更新されます。
+特に1秒辺りのページビューが1を越えるサイトでは、JSON_UPDATE_PROBARILITY の値を小さくすることをお勧めします。
 
 == AZlink/Widget から移行する際の注意点
 

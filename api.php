@@ -29,15 +29,10 @@
 global $JSON_CACHE_DIR, $WORK_DIR, $JSON_CACHE_LIFETIME,
        $JSON_UPDATE_PROBARILITY, $KEEP_RSS_TEMPORARY_FILES;
 
-// デフォルト値のセット
-// 詳細は config.php.example 参照
-$JSON_CACHE_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'json';
-$WORK_DIR = dirname(__file__) . DIRECTORY_SEPARATOR . 'work';
-$JSON_CACHE_LIFETIME = 3600;
-$JSON_UPDATE_PROBARILITY = 1.0;
-$KEEP_RSS_TEMPORARY_FILES = false;
+// デフォルト値を読み込む
+require_once 'config.php.defaults';
 
-// config.php を読み込む
+// config.php （があれば）読み込む
 @include 'config.php';
 
 // 
