@@ -30,8 +30,7 @@ data = response.read()
 conn.close
 
 fh = open(sys.argv[2], 'wb')
-print >> fh, '// This file is a part of AZlink-TinyWidget.'
-print >> fh, '// AZlink-TinyWidget is licensed under the MIT license.'
-print >> fh, '// See https://github.com/sakuratan/AZlink-TinyWidget for more details.'
+print >> fh, '// This file is licensed under the MIT license'
+print >> fh, '// https://github.com/sakuratan/AZlink-TinyWidget'
 fh.write(data)
 fh.close()
