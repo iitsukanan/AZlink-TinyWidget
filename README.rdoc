@@ -19,7 +19,7 @@ PHP 5.2.16 以上が動作するウェブサーバ（Apache 2.2.9 と nginx 1.0.
 
 == インストール
 
-1. https://github.com/sakuratan/AZlink-TinyWidget/downloads から azlink-tinywidget-1.0.2.zip をダウンロードしてください。
+1. https://github.com/sakuratan/AZlink-TinyWidget/downloads から azlink-tinywidget-1.0.3.zip をダウンロードしてください。
 
 2. ウェブサーバ上で ZIP ファイルを展開してください。
 
