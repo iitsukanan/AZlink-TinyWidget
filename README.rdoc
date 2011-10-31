@@ -37,7 +37,7 @@ PHP 5.2.16 以上が動作するウェブサーバ（Apache 2.2.9 と nginx 1.0.
 
   cp config.php.defaults config.php
 
-特に1秒辺りのページビューが1を越えるサイトでは、JSON_UPDATE_PROBARILITY の値を小さくすることをお勧めします。
+特に1秒辺りのページビューが1を越えるサイトでは、JSON_UPDATE_PROBABILITY の値を小さくすることをお勧めします。
 
 == AZlink/Widget から移行する際の注意点
 
@@ -48,3 +48,7 @@ PHP 5.2.16 以上が動作するウェブサーバ（Apache 2.2.9 と nginx 1.0.
 3. 商品データのオブジェクト構造が変更されています。
 
 4. データの取得を JSON で行っていますので、ドメイン越しでのスクリプトの実行はできません。
+
+== Updating
+
+[v1.0.2 to v1.0.3] JSON_UPDATE_PROBABILITY が JSON_UPDATE_PROBARILITY に typo してましたので修正しています。typo した値でも動くようにしていますが将来的にはサポートしませんので早めに変更してください。
