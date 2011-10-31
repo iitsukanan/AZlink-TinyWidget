@@ -451,11 +451,13 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 		    ajax_json(api_url, json_callback);
 
 		} else {
-		    if (retval && retval.expire &&
-			Math.random() <= parseFloat(retval.probability)) {
-			var expire = new Date(retval.expire);
-			var now = new Date();
-			if (expire.getTime() < now.getTime()) {
+		    if (retval && retval.expire) {
+			var expire = new Date(retval.expire),
+			    now = new Date(),
+			    // Fallback for v1.0.2
+			    probability = (typeof(retval.probability) == 'undefined' ? 1.0 : parseFloat(retval.probability));
+			if (expire.getTime() < now.getTime() &&
+			    Math.random() <= probability) {
 			    ajax_json(api_url, json_callback);
 			    return;
 			}

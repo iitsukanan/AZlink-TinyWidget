@@ -30,7 +30,13 @@
 require_once 'config.php.defaults';
 
 // config.php （があれば）読み込む
-@include 'config.php';
+if (@include 'config.php') {
+    // v1.0.2 で typo してたので fallback
+    if (isset($GLOBALS['JSON_UPDATE_PROBARILITY']) &&
+	$GLOBALS['JSON_UPDATE_PROBABILITY'] == 1.0) {
+	$GLOBALS['JSON_UPDATE_PROBABILITY'] = $GLOBALS['JSON_UPDATE_PROBARILITY'];
+    }
+}
 
 // 
 
@@ -152,7 +158,7 @@ function parse_rss_string($ctx) {
     return array(
 	'items' => $items,
 	'expire' => gmdate('r', time() + $GLOBALS['JSON_CACHE_LIFETIME']),
-	'probarility' => $GLOBALS['JSON_UPDATE_PROBARILITY'],
+	'probability' => $GLOBALS['JSON_UPDATE_PROBABILITY'],
     );
 }
 

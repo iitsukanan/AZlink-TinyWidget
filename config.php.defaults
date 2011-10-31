@@ -26,7 +26,7 @@ $JSON_CACHE_LIFETIME = 3600 * 2;
 // JSON キャッシュの生存期間を過ぎたファイルに対して JavaScript から
 // 更新指示を出す確率で、0.0〜1.0で指定してください。
 // min(1.0 / 閑散期の1分あたりの PV (ページビュー), 1.0) ぐらいの値が適切です。
-$JSON_UPDATE_PROBARILITY = 1.0;
+$JSON_UPDATE_PROBABILITY = 1.0;
 
 // true なら RSS テンポラリファイルを残す（どちらかと言えばデバッグ用）
 $KEEP_RSS_TEMPORARY_FILES = false;
