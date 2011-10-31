@@ -1,6 +1,6 @@
 PYTHON=		python
 
-VERS=		1.0.3
+VERS=		1.0.4
 DISTNAME=	azlink-tinywidget-$(VERS)
 DIST=		$(DISTNAME).zip
 DISTFILES=	api.php config.php.defaults tinywidget.min.js \
