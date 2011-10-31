@@ -23,7 +23,7 @@ dist: all
 	umask 0; tar -cf - $(DISTFILES) | (cd $(DISTNAME); tar -xf -)
 	cd $(DISTNAME); chmod 777 json work
 	zip -qX -r $(DIST) $(DISTNAME)/*
-	#rm -rf $(DISTNAME)
+	rm -rf $(DISTNAME)
 
 distclean: clean
 	rm -rf $(DIST)
