@@ -8,7 +8,10 @@ DISTFILES=	api.php config.php.defaults tinywidget.min.js \
 
 .PHONY: all clean dist distclean
 
-all: tinywidget.min.js
+all: README.rdoc tinywidget.min.js
+
+README.rdoc: README.rdoc.in Makefile
+	sed -e 's/@VERS@/$(VERS)/g' README.rdoc.in > README.rdoc
 
 tinywidget.min.js: compile.py tinywidget.js
 	$(PYTHON) compile.py tinywidget.js $@
