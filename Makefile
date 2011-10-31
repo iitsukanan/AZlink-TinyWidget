@@ -3,17 +3,12 @@ PYTHON=		python
 VERS=		1.0.3
 DISTNAME=	azlink-tinywidget-$(VERS)
 DIST=		$(DISTNAME).zip
-DIRS=		json
 DISTFILES=	api.php config.php.defaults tinywidget.min.js \
-		styles.css index.html work/.htaccess
+		styles.css index.html json/.empty work/.htaccess
 
 .PHONY: all clean dist distclean
 
-all: $(DIRS) tinywidget.min.js
-	@chmod 777 $(DIRS)
-
-$(DIRS):
-	mkdir -p $@
+all: tinywidget.min.js
 
 tinywidget.min.js: compile.py tinywidget.js
 	$(PYTHON) compile.py tinywidget.js $@
@@ -26,9 +21,9 @@ dist: all
 	rm -rf $(DIST) $(DISTNAME)
 	mkdir $(DISTNAME)
 	umask 0; tar -cf - $(DISTFILES) | (cd $(DISTNAME); tar -xf -)
-	cd $(DISTNAME); mkdir $(DIRS); chmod 777 $(DIRS)
+	cd $(DISTNAME); chmod 777 json work
 	zip -qX -r $(DIST) $(DISTNAME)/*
-	rm -rf $(DISTNAME)
+	#rm -rf $(DISTNAME)
 
 distclean: clean
 	rm -rf $(DIST)
