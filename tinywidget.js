@@ -299,11 +299,11 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 
 	// バナー
 	function banner_generator(items, opts) {
-	    var table = document.createElement('table');
+	    var table = document.createElement('table'),
+		tbody = document.createElement('tbody'),
+		wrapper = document.createElement('tr');
 	    table.className = 'azlink-widget azlink-banner-widget';
-	    var tbody = document.createElement('tbody');
 	    table.appendChild(tbody);
-	    var wrapper = document.createElement('tr');
 	    tbody.appendChild(wrapper);
 
 	    for (var i = 0; i < items.length; ++i) {
@@ -389,8 +389,7 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	    if (typeof(opts.imageFlags) == 'undefined')
 		opts.imageFlags = [ 'AA160' ];
 
-	    var dest;
-	    var scripts = document.getElementsByTagName('script');
+	    var dest, scripts = document.getElementsByTagName('script');
 	    if (scripts && scripts.length) {
 		dest = scripts[0].parentNode;
 	    } else if (document.body) {
@@ -443,8 +442,8 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 	     * cron を使わなくて済むようにするのが目的。
 	     */
 
-	    var json_url = baseuri + 'json/' + node + '.js';
-	    var api_url = baseuri + 'api.php?node=' + encodeURIComponent(node);
+	    var json_url = baseuri + 'json/' + node + '.js',
+		api_url = baseuri + 'api.php?node=' + encodeURIComponent(node);
 
 	    ajax_json(json_url, function(retval, status) {
 		if (status == 404) {
@@ -484,10 +483,10 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 
 	    // API を呼び出す
 	    opts.onload = function(items, opts) {
-		var stub = document.getElementById(id);
-		var parentNode = stub.parentNode;
+		var stub = document.getElementById(id),
+		    dest = (opts.generator)(items, opts);
 
-		var dest = (opts.generator)(items, opts);
+		var parentNode = stub.parentNode;
 		if (dest) {
 		    if (typeof(dest) == 'string') {
 			var tmp = document.createElement('div');
