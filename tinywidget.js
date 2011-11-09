@@ -164,6 +164,12 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 
 	    var anchor = document.createElement('a');
 	    anchor.href = item.link;
+	    if (typeof(opts.target) != 'undefined') {
+		if (opts.target)
+		    anchor.target = opts.target;
+	    } else {
+		anchor.target = "_blank";
+	    }
 	    anchor.className = 'azlink-widget-associate-link';
 
 	    if (opts.onClickHook) {
