@@ -410,7 +410,7 @@ if (typeof(AZlink.TinyWidget) == 'undefined') {
 		var items = (retval && retval.items) ? retval.items : [];
 
 		if (typeof(opts.numItems) != 'undefined')
-		    items.splice(opts.numItems);
+		    items.splice(opts.numItems, items.length - opts.numItems);
 
 		for (var i = 0; i < items.length; ++i) {
 		    var item = items[i];
